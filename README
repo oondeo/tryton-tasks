@@ -10,6 +10,14 @@ Dependencies
 
 pip install invoke
 
+* Blessings
+
+pip install blessings
+
+* Hgapi
+
+pip install hgapi
+
 
 Install
 =======
