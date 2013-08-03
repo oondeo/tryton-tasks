@@ -57,7 +57,7 @@ def status(verbose=False):
         if not st and not verbose:
             return
 
-        msg = [t.bold_red(module + ':Not OK')]
+        msg = [t.bold_red("\n"+ module + ':Not OK')]
 
         if st.get('A'):
             msg.append(t.bold('Files Added'))
@@ -66,7 +66,7 @@ def status(verbose=False):
         if st.get('M'):
             msg.append(t.bold('Files Modified'))
             for file_name in st['M']:
-                msg.append('  ', t.yellow(file_name))
+                msg.append('  ' + t.yellow(file_name))
         if st.get('R'):
             msg.append(t.bold('Files Removed'))
             for file_name in st['R']:
@@ -101,14 +101,16 @@ def diff(verbose=False):
         if not os.path.exists(path_repo):
             print t.red("Missing repositori:") + t.bold(path_repo)
             return
-        print t.bold(module+"\n")
         if not verbose:
-            run('hg diff --stat %s' % path_repo)
+            print t.bold(module+"\n")
+            run('cd %s; hg diff --stat' % path_repo)
             return
 
         repo = hgapi.Repo(path_repo)
         for diff in repo.hg_diff():
-            print diff['diff']
+            if diff:
+                print t.bold(module+"\n")
+                print diff['diff']
 
     for section in Config.sections():
         repo = Config.get(section, 'repo')
