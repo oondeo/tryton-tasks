@@ -1,0 +1,53 @@
+=============
+Tryton Utils
+=============
+
+
+Dependencies
+============
+
+* Invoke
+
+pip install invoke
+
+
+Install
+=======
+
+hg clone https://bitbucket.org/nantic/tryton-utils task
+hg clone https://bitbucket.org/nantic/tryton-config config
+
+
+Directory structure.
+
+/repo-dir/
+/repo-dir/utils
+/repo-dir/config
+
+
+
+Help
+====
+
+To add new repository, please add new file on config dir or add new repo on 
+existing cfg file.
+
+Directory has symbolink link local.cfg to parent dir to append custom 
+repositories
+
+All actions search for repositories defined on config directory.
+
+.. 
+    > cd repo-dir
+
+    To see list of task.
+    > invoke -l 
+
+
+
+
+
+
+
+
+
