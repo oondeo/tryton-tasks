@@ -52,33 +52,28 @@ def status(verbose=False):
         repo = hgapi.Repo(repo_path)
         st = repo.hg_status(empty=True)
         if not st and verbose:
-            print module, t.bold_green('OK')
+            print t.bold_green('\['+ module +']')
             return
         if not st and not verbose:
             return
 
-        msg = [t.bold_red("\n"+ module + ':Not OK')]
+        msg = [t.bold_red("\n["+ module + ']')]
 
         if st.get('A'):
-            msg.append(t.bold('Files Added'))
             for file_name in st['A']:
-                msg.append('  ' + t.green(file_name))
+                msg.append(t.green('A '+ file_name))
         if st.get('M'):
-            msg.append(t.bold('Files Modified'))
             for file_name in st['M']:
-                msg.append('  ' + t.yellow(file_name))
+                msg.append(t.yellow('M '+file_name))
         if st.get('R'):
-            msg.append(t.bold('Files Removed'))
             for file_name in st['R']:
-                msg.append('  ' + t.red(file_name))
+                msg.append(t.red('R '+file_name))
         if st.get('!'):
-            msg.append(t.bold('Files Deleted'))
             for file_name in st['!']:
-                msg.append('  ' + t.bold_red(file_name))
+                msg.append(t.bold_red('! '+ file_name))
         if st.get('?'):
-            msg.append(t.bold('Files Not Tracked'))
             for file_name in st['?']:
-                msg.append('  ' + t.blue(file_name))
+                msg.append(t.blue('? ' + file_name))
 
         print "\n".join(msg)
 
