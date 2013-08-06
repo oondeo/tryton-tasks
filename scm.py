@@ -173,3 +173,70 @@ def ppush(verbose=False):
         p.start()
     p.join()
 
+@task
+def pull(update=True):
+    def hg_pull(module, path, update):
+        path_repo = os.path.join(path, module)
+        if not os.path.exists(path_repo):
+            print t.red("Missing repositori:") + t.bold(path_repo)
+            return
+        repo = hgapi.Repo(path_repo)
+        cmd = ['pull']
+        if update:
+            cmd.append('-u')
+        try:
+            out = repo.hg_command(*cmd)
+        except:
+            #TODO:catch correct exception
+            print t.red("= " + module +" = KO!")
+            return
+        if "no changes found" in out:
+            return
+        print t.bold("= " + module +" =")
+        print out
+
+    for section in Config.sections():
+        repo = Config.get(section, 'repo')
+        path = Config.get(section, 'path')
+        func = hg_pull
+        if repo != 'hg':
+            print "Not developet yet"
+            continue
+        p = Process(target=func, args=(section, path, update))
+        p.start()
+    p.join()
+
+
+@task
+def update(clean=False):
+    def hg_update(module, path, update):
+        path_repo = os.path.join(path, module)
+        if not os.path.exists(path_repo):
+            print t.red("Missing repositori:") + t.bold(path_repo)
+            return
+        repo = hgapi.Repo(path_repo)
+        cmd = ['update']
+        if clean:
+            cmd.append('-C')
+        try:
+            out = repo.hg_command(*cmd)
+        except:
+            #TODO:catch correct exception
+            print t.red("= " + module +" = KO!")
+            return
+        if "0 files updated, 0 files merged, 0 files removed, 0 files unresolved" in out:
+            return
+        print t.bold("= " + module +" =")
+        print out
+
+    for section in Config.sections():
+        repo = Config.get(section, 'repo')
+        path = Config.get(section, 'path')
+        func = hg_update
+        if repo != 'hg':
+            print "Not developet yet"
+            continue
+        p = Process(target=func, args=(section, path, update))
+        p.start()
+    p.join()
+
