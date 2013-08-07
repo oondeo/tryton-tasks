@@ -7,6 +7,7 @@ import os
 import ConfigParser
 from multiprocessing import Process
 
+
 t = Terminal()
 Config = ConfigParser.ConfigParser()
 
@@ -39,6 +40,7 @@ def clone():
         p.start()
 
     p.join()
+
 
 
 @task
