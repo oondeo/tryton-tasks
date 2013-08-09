@@ -11,13 +11,18 @@ from multiprocessing import Process
 t = Terminal()
 Config = ConfigParser.ConfigParser()
 
-for r,d,f in os.walk("./config"):
-    for files in f:
-        if files.endswith(".cfg"):
-            Config.readfp(open(os.path.join(r,files)))
+def read_config_file(config_file=None):
+    if not config_file is None:
+        Config.readfp(open(config_file))
+        return
+
+    for r,d,f in os.walk("./config"):
+        for files in f:
+            if files.endswith(".cfg"):
+                Config.readfp(open(os.path.join(r,files)))
 
 @task
-def clone():
+def clone(config=None):
 
     def hg_clone(module, url, path):
         print "Adding Module " + t.bold(module) + " to clone list"
@@ -28,6 +33,7 @@ def clone():
             run('hg clone -q %s %s' % (url, repo_path))
             print "Repo " + t.bold(repo_path) + t.green(" Cloned")
 
+    read_config_file(config)
     for section in Config.sections():
         repo = Config.get(section, 'repo')
         url = Config.get(section, 'url')
@@ -44,7 +50,7 @@ def clone():
 
 
 @task
-def status(verbose=False):
+def status(config=None, verbose=False):
 
     def hg_status(module, path, verbose):
         repo_path = os.path.join(path, module)
@@ -79,6 +85,7 @@ def status(verbose=False):
 
         print "\n".join(msg)
 
+    read_config_file(config)
     for section in Config.sections():
         repo = Config.get(section, 'repo')
         path = Config.get(section, 'path')
@@ -92,7 +99,7 @@ def status(verbose=False):
 
 
 @task
-def diff(verbose=False):
+def diff(config=None, verbose=False):
     def hg_diff(module, path, verbose):
         path_repo = os.path.join(path, module)
         if not os.path.exists(path_repo):
@@ -109,6 +116,7 @@ def diff(verbose=False):
                 print t.bold(module+"\n")
                 print diff['diff']
 
+    read_config_file(config)
     for section in Config.sections():
         repo = Config.get(section, 'repo')
         path = Config.get(section, 'path')
@@ -116,7 +124,7 @@ def diff(verbose=False):
 
 
 @task
-def summary(verbose=False):
+def summary(config=None, verbose=False):
     def hg_summary(module, path, verbose):
         path_repo = os.path.join(path, module)
         if not os.path.exists(path_repo):
@@ -128,6 +136,7 @@ def summary(verbose=False):
         print t.bold("= " + module +" =")
         print summary
 
+    read_config_file(config)
     for section in Config.sections():
         repo = Config.get(section, 'repo')
         path = Config.get(section, 'path')
@@ -141,7 +150,7 @@ def summary(verbose=False):
 
 
 @task
-def ppush(verbose=False):
+def ppush(config=None, verbose=False):
     def hg_ppush(module, path, verbose):
         path_repo = os.path.join(path, module)
         if not os.path.exists(path_repo):
@@ -159,6 +168,7 @@ def ppush(verbose=False):
         print t.bold("= " + module +" =")
         print out
 
+    read_config_file(config)
     for section in Config.sections():
         repo = Config.get(section, 'repo')
         path = Config.get(section, 'path')
@@ -171,7 +181,7 @@ def ppush(verbose=False):
     p.join()
 
 @task
-def pull(update=True):
+def pull(config=None, update=True):
     def hg_pull(module, path, update):
         path_repo = os.path.join(path, module)
         if not os.path.exists(path_repo):
@@ -192,6 +202,7 @@ def pull(update=True):
         print t.bold("= " + module +" =")
         print out
 
+    read_config_file(config)
     for section in Config.sections():
         repo = Config.get(section, 'repo')
         path = Config.get(section, 'path')
@@ -205,7 +216,7 @@ def pull(update=True):
 
 
 @task
-def update(clean=False):
+def update(config=None, clean=False):
     def hg_update(module, path, update):
         path_repo = os.path.join(path, module)
         if not os.path.exists(path_repo):
@@ -226,6 +237,7 @@ def update(clean=False):
         print t.bold("= " + module +" =")
         print out
 
+    read_config_file(config)
     for section in Config.sections():
         repo = Config.get(section, 'repo')
         path = Config.get(section, 'path')
