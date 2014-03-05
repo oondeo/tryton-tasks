@@ -1,0 +1,71 @@
+=============
+Tryton Utils
+=============
+
+
+Dependencies
+============
+
+* Invoke
+
+pip install invoke
+
+* Blessings
+
+pip install blessings
+
+* Hgapi
+
+pip install hgapi
+
+
+You can install all of them with requirements.txt file:
+
+pip install -r requriements.txt
+
+
+Install
+=======
+
+hg clone https://bitbucket.org/nantic/tryton-tasks tasks
+hg clone https://bitbucket.org/nantic/tryton-config config
+
+
+Directory structure.
+
+/repo-dir/
+/repo-dir/task
+/repo-dir/config
+
+
+
+Help
+====
+
+To add new repository, please add new file on config dir or add new repo on
+existing cfg file.
+
+Directory has symbolink link local.cfg to parent dir to append custom
+repositories
+
+All actions search for repositories defined on config directory.
+
+..
+    > cd repo-dir
+
+    To see list of task.
+    > invoke -l
+
+
+If you aren't in the root directory, you can call _invoke_ with _--root/-r_
+option with the path to _repo-dir_ directory:
+
+..
+     > invoke --root=../
+
+If you haven't renamed _tryton-tasks_ to _tasks_, you can call _invoke_ with
+_--collection/-c_ option with the path to _tryton-tasks_ directory:
+
+..
+      > invoke --root=../tryton-tasks
+
