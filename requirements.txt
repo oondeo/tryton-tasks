@@ -11,3 +11,6 @@ psutil
 -e hg+https://bitbucket.org/DavidVilla/python-bitbucket-api#egg=bitbucket-api
 configobj
 PyHamcrest
+
+# gal
+dateutils
