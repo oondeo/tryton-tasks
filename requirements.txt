@@ -1,0 +1,19 @@
+blessings
+GitPython>=0.3.2.RC1
+hgapi
+invoke>=0.6
+path.py
+pyactiveresource
+python-sql>=0.2
+psycopg2
+psutil
+--allow-external RBTools
+--allow-unverified RBTools
+RBTools
+
+-e hg+https://bitbucket.org/DavidVilla/python-bitbucket-api#egg=bitbucket-api
+configobj
+PyHamcrest
+
+# gal
+dateutils
