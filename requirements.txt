@@ -1,0 +1,18 @@
+blessings
+GitPython>=0.3.2.RC1
+hgapi
+invoke==0.7
+path.py
+pyactiveresource
+python-sql>=0.2
+psycopg2
+psutil
+--allow-external RBTools
+--allow-unverified RBTools
+RBTools
+
+configobj
+PyHamcrest
+
+# gal
+dateutils
