@@ -1,0 +1,122 @@
+=============
+Tryton Utils
+=============
+
+
+Dependencies
+============
+
+* Invoke
+
+pip install invoke
+
+* Blessings
+
+pip install blessings
+
+* Hgapi
+
+pip install hgapi
+
+
+You can install all of them with requirements.txt file:
+
+pip install -r requriements.txt
+
+
+Install
+=======
+
+hg clone https://bitbucket.org/nantic/tryton-tasks tasks
+hg clone https://bitbucket.org/nantic/tryton-config config
+
+
+Directory structure.
+
+/repo-dir/
+/repo-dir/task
+/repo-dir/config
+
+
+
+Help
+====
+
+To add new repository, please add new file on config dir or add new repo on
+existing cfg file.
+
+Directory has symbolink link local.cfg to parent dir to append custom
+repositories
+
+All actions search for repositories defined on config directory.
+
+..
+    > cd repo-dir
+
+    To see list of task.
+    > invoke -l
+
+
+If you aren't in the root directory, you can call _invoke_ with _--root/-r_
+option with the path to _repo-dir_ directory:
+
+..
+     > invoke --root=../
+
+If you haven't renamed _tryton-tasks_ to _tasks_, you can call _invoke_ with
+_--collection/-c_ option with the path to _tryton-tasks_ directory:
+
+..
+      > invoke --root=../tryton-tasks
+
+
+
+ReviewBoard
+===========
+
+To setup task to work with reviewboard just copy tryton-tasks.cfg.template to
+~/.tryton-tasks.cfg and configure user, password  and server
+
+You need to install python-rbtools package not available on pip.
+
+
+Tryton
+======
+
+To setup task to work with reviewboard just copy tryton-tasks.cfg.template to
+~/.tryton-tasks.cfg and configure url to production server.
+
+To create new review.
+---------------------
+This create a new review on reviewboard and a review on tryton attached to task
+
+inv project.review -p _path_to_module_ -t _tryton_task_code_
+
+Task List.
+----------
+
+inv project.list
+inv project.list --party nantic%  #to filter all task of nantic party.
+inv project.list --assigned angel%  #to filter all task assigned to angel
+
+
+
+Bitbucket
+==========
+
+Facilities to work with Bitbucket.
+
+To work with clone https://github.com/angelnan/bitbucketcli and install.
+
+To login:
+bitbucket login
+
+To logout:
+bitbucket logout
+
+Examples to create new repository.
+
+inv bb.create repository_name -d description
+
+
+
