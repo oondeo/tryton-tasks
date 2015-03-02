@@ -11,7 +11,8 @@ psutil
 --allow-external RBTools
 --allow-unverified RBTools
 RBTools
-
+python-quilt
+tabulate
 configobj
 PyHamcrest
 

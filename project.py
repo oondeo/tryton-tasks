@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import os
+import ssl
 import sys
+import datetime
 
 from invoke import task, Collection
 
@@ -9,6 +11,7 @@ from . import reviewboard
 from .scm import get_branch
 from .utils import t
 import logging
+from tabulate import tabulate
 
 try:
     from proteus import config as pconfig, Model
@@ -23,7 +26,10 @@ logger = logging.getLogger("nan-tasks")
 
 def get_tryton_connection():
     tryton = settings['tryton']
-    return pconfig.set_xmlrpc(tryton['server'])
+    ssl_context = ssl.create_default_context()
+    ssl_context.check_hostname = False
+    ssl_context.verify_mode = ssl.CERT_NONE
+    return pconfig.set_xmlrpc(tryton['server'], ssl_context=ssl_context)
 
 
 @task
@@ -96,7 +102,6 @@ def close_review(work):
     reviews = Review.find([('work.code', '=', work)])
     for review in reviews:
         reviewboard.close(review.review_id)
-
 
 @task()
 def fetch_reviews(branch='default', component=None, exclude_components=None):
@@ -174,7 +179,10 @@ def upload_review(work, path, review=None, new=False):
     review_id = reviewboard.create(path, task.rec_name,
         task.comment, task.code, review)
 
-    review = Review.find([('review_id', '=', str(review_id))])
+    review = Review.find([
+            ('review_id', '=', str(review_id)),
+            ('work', '=', task.id),
+            ])
     if not review:
         review = Review()
     else:
@@ -189,9 +197,49 @@ def upload_review(work, path, review=None, new=False):
     review.save()
 
 
+def work_report(date):
+    get_tryton_connection()
+
+    Timesheet = Model.get('timesheet.line')
+
+    lines = Timesheet.find([('date', '=', date)])
+    result = {}
+    for line in lines:
+        if not result.get(line.employee.rec_name):
+            result[line.employee.rec_name] = {}
+        work_name = line.project_work.rec_name
+        if not result[line.employee.rec_name].get(work_name):
+            if not line.hours:
+                work_name = '* ' + work_name
+
+            result[line.employee.rec_name][work_name] = {
+                'hours': line.hours,
+                'tracker': line.project_work.tracker.rec_name,
+                'state': line.project_work.state,
+                'phase': line.project_work.task_phase.rec_name,
+            }
+        else:
+            result[line.employee.rec_name][work_name]['hours'] += line.hours
+
+    for employee, tasks in result.iteritems():
+        print "\nemployee:", employee
+        table = []
+        for work, val in tasks.iteritems():
+            table += [[work] + val.values()]
+
+        print tabulate(table)
+
+@task()
+def working(date=None):
+    if date is None:
+        date = datetime.date.today()
+    work_report(date)
+
+
 ProjectCollection = Collection()
 ProjectCollection.add_task(upload_review)
 ProjectCollection.add_task(fetch_review)
 ProjectCollection.add_task(close_review)
 ProjectCollection.add_task(tasks)
 ProjectCollection.add_task(ct)
+ProjectCollection.add_task(working)

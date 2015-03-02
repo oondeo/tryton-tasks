@@ -47,13 +47,17 @@ def get_module_key(filename):
 
 
 def check_output(args, env=None, errors=False):
-    process = subprocess.Popen(args, env=env, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
-    data, stderr = process.communicate()
-    if errors:
-        data += '-' * 50 + '\n' + stderr
-    if stderr:
-        raise Exception("Exception executing %s" % args)
+    try:
+        process = subprocess.Popen(args, env=env, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        data, stderr = process.communicate()
+        if errors:
+            data += '-' * 50 + '\n' + stderr
+        if stderr:
+            raise Exception("Exception executing %s" % args)
+    except:
+        logger.exception("Exception executing %s:" % args, exc_info=1)
+        return "Exception executing %s:" % args
     return data
 
 
@@ -203,7 +207,7 @@ class TrytonTestRunner(object):
         self._coverage = coverage
         self.pyflakes_result = {}
 
-    def upload_tryton(self, db_type, failfast, name, reviews):
+    def upload_tryton(self, db_type, failfast, name, reviews, work):
         logger.info("Generating report for execution %s" % name)
         report = self._generate_report(self.result)
         logger.info("Report for execution %s" % name)
@@ -212,6 +216,7 @@ class TrytonTestRunner(object):
         TestGroup = Model.get('project.test.build.group')
         Component = Model.get('project.work.component')
         TestResult = Model.get('project.test.build.result')
+        ProjectWork = Model.get('project.work')
 
         group = TestGroup()
         group.name = name
@@ -220,6 +225,10 @@ class TrytonTestRunner(object):
         group.start = self.startTime
         group.end = self.stopTime
         group.db_type = db_type
+
+        if work:
+            work, = ProjectWork.find([('code', '=', work)])
+            group.work = work
         for module in report:
             logger.info("Create Test Report for Module: %s" % module)
             result = report[module]

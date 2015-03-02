@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 from invoke import task, run, Collection
 import os
@@ -10,6 +11,8 @@ from ConfigParser import NoOptionError
 import logging
 import time
 from coverage import coverage
+from .utils import read_config_file
+import tryton_component as component
 
 TEST_FILE = 'tests.log'
 open(TEST_FILE, 'w').close()
@@ -19,7 +22,7 @@ logging.basicConfig(filename=TEST_FILE, level=logging.INFO,
     datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger("nan-tasks")
 
-#Ensure path is loaded correctly
+# Ensure path is loaded correctly
 sys.path.insert(0, os.path.abspath(os.path.normpath(os.path.join(
         os.path.dirname(__file__), '..', ''))))
 for module_name in ('trytond', 'proteus'):
@@ -28,8 +31,9 @@ for module_name in ('trytond', 'proteus'):
     if os.path.isdir(DIR):
         sys.path.insert(0, DIR)
 
-#Now we should be able to import everything
+# Now we should be able to import everything
 import TrytonTestRunner
+
 older_version = True
 try:
     # TODO: Remove compatibility with older versions
@@ -42,7 +46,7 @@ except ImportError:
         pass
 
 
-def test(dbtype, name, modules, failfast, reviews):
+def test(dbtype, name, modules, failfast, reviews=False, work=None):
 
     if older_version:
         CONFIG['db_type'] = dbtype
@@ -65,6 +69,7 @@ def test(dbtype, name, modules, failfast, reviews):
     from trytond.tests.test_tryton import modules_suite
     import proteus.tests
 
+    suite = None
     if modules:
         suite = modules_suite(modules)
     else:
@@ -77,7 +82,44 @@ def test(dbtype, name, modules, failfast, reviews):
         name = name + " ["+modules+"]"
 
     logger.info('Upload results to tryton')
-    runner.upload_tryton(dbtype, failfast, name, reviews)
+    runner.upload_tryton(dbtype, failfast, name, reviews, work)
+
+
+@task()
+def module(module, work=None,  dbtype='sqlite', fail_fast=False):
+    name = 'Development Test for module'
+    test(failfast=fail_fast, dbtype=dbtype, modules=module, name=name,
+        work=work)
+
+
+@task()
+def modules(dbtype='sqlite', force=False):
+    Config = read_config_file()
+
+    components = {}
+    if not force:
+        components = component._pull()
+
+    to_test = []
+
+    for section in Config.sections():
+        comp = components.get(section, False)
+
+        if force or not comp:
+            to_test.append(section)
+            continue
+
+        test_revision = comp.last_build and comp.last_build.revision
+        repo = scm.get_repo(section, Config, 'revision')
+        if (test_revision or (test_revision and
+                scm.hg_is_last_revision(repo['path'], test_revision))):
+            continue
+        to_test.append(section)
+
+    print "Testing :", len(to_test), "/", len(Config.sections())
+    for tm in to_test:
+        print "Testing module:", tm
+        run('inv test.module -m %s' % tm)
 
 
 @task()
@@ -198,3 +240,6 @@ def setup(branch='default', force=True, fetch=True):
 TestCollection = Collection()
 TestCollection.add_task(clean)
 TestCollection.add_task(runall)
+TestCollection.add_task(module)
+TestCollection.add_task(modules)
+
