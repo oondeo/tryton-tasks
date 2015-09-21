@@ -1,0 +1,25 @@
+blessings
+coverage
+GitPython>=0.3.2.RC1
+hgapi
+invoke>=0.7
+path.py
+pyactiveresource
+python-sql>=0.2
+psycopg2
+psutil
+--allow-external RBTools
+--allow-unverified RBTools
+RBTools
+python-quilt
+tabulate
+configobj
+PyHamcrest
+
+# gal
+dateutils
+xmltodict
+functools32
+
+# bitbucket
+git+https://github.com/angelnan/bitbucketcli.git
