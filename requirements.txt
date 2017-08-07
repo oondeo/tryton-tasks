@@ -1,0 +1,37 @@
+blessings
+coverage
+GitPython>=0.3.2
+hgapi
+invoke==0.12.2
+path.py>=10.0
+pyactiveresource
+psutil
+--allow-external RBTools
+--allow-unverified RBTools
+RBTools
+python-quilt
+tabulate
+configobj
+PyHamcrest
+choice
+faulthandler
+requests
+
+# gal
+dateutils
+xmltodict
+functools32
+
+# bitbucket
+markerlib
+
+# trytond
+lxml>=2.0
+relatorio>=0.2.0
+Genshi
+python-dateutil
+polib
+psycopg2>=2.5.0
+python-sql>=0.8
+werkzeug
+wrapt
